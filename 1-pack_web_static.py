@@ -1,19 +1,26 @@
 #!/usr/bin/python3
-from fabric.api import *
-import os
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 13 14:21:54 2020
+@author: Robinson Montes
+"""
+from fabric.api import local, env
 from datetime import datetime
 
-env.hosts = ['localhost']
+env.user = 'ubuntu'
+env.hosts = ['35.227.35.75', '100.24.37.33']
 
 
 def do_pack():
-    try:
-        filepath = "versions/web_static_" + datetime.now().\
-                   strftime("%Y%m%d%H%M%S") + ".tgz"
-        local("mkdir -p versions")
-        local("tar -zcvf versions/web_static_$(date +%Y%m%d%H%M%S).tgz\
-        web_static")
-        print("web_static packed: {} -> {}".
-              format(filepath, os.path.getsize(filepath)))
-    except:
-            return None
+    """
+    Targging project directory into a packages as .tgz
+    """
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    local('sudo mkdir -p ./versions')
+    path = './versions/web_static_{}'.format(now)
+    local('sudo tar -czvf {}.tgz web_static'.format(path))
+    name = '{}.tgz'.format(path)
+    if name:
+        return name
+    else:
+        return None
