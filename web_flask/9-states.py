@@ -1,49 +1,37 @@
 #!/usr/bin/python3
-from flask import Flask, render_template
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep  1 14:42:23 2020
+
+@author: Robinson Montes
+"""
 from models import storage
 from models.state import State
-from models.city import City
-
-
+from flask import Flask, render_template
 app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def tear_down(self):
-    """tear down app context"""
+def appcontext_teardown(self):
+    """use storage for fetching data from the storage engine
+    """
     storage.close()
 
 
 @app.route('/states', strict_slashes=False)
-def list_all_states():
-    """lists states from database
-    Returns:
-        HTML
-    """
-    dict_states = storage.all(State)
-    all_states = []
-    for k, v in dict_states.items():
-        all_states.append(v)
-    return render_template('9-states.html', all_states=all_states)
+def state_info():
+    """Display a HTML page inside the tag BODY"""
+    return render_template('7-states_list.html',
+                           states=storage.all(State))
 
 
-@app.route('/states/<id>', strict_slashes=False)
-def find_state(id):
-    """lists states from database with specific id
-    Args:
-        id (str): id
-    Returns:
-        HTML
-    """
-    dict_states = storage.all(State)
-    all_states = []
-    all_states_id = []
-    for k, v in dict_states.items():
-        all_states_id.append(v.id)
-        all_states.append(v)
-    return render_template('9-states.html', all_states=all_states,
-                           all_states_id=all_states_id, id=id)
+@app.route('/states/<string:id>', strict_slashes=False)
+def state_id(id=None):
+    """Display a HTML page inside the tag BODY"""
+    return render_template('9-states.html',
+                           states=storage.all(State)
+                           .get('State.{}'.format(id)))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
